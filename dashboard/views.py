@@ -14,12 +14,20 @@ def login_view(request):
         email = request.POST['email']
         password = request.POST['password']
         
-        user = authenticate(request, username=email, password=password)
-        if user is not None:
-            auth_login(request, user)
-            return redirect('/')
-        else:
+        try:
+            user = CustomUser.objects.get(email=email)
+            if not user.is_active:
+                messages.error(request, 'Account for this email is not active. Please contact the site owner.')
+            else:
+                user = authenticate(request, username=email, password=password)
+                if user is not None:
+                    auth_login(request, user)
+                    return redirect('/')
+                else:
+                    messages.error(request, 'Invalid email or password.')
+        except CustomUser.DoesNotExist:
             messages.error(request, 'Invalid email or password.')
+
     return render(request, 'login.html')
 
 @login_required(login_url='login')

@@ -27,6 +27,13 @@
                                     </div>
                                     <form class="user" method="post" action="{% url 'login' %}">
                                         {% csrf_token %}
+                                        {% if messages %}
+                                            <div class="alert alert-danger">
+                                                {% for message in messages %}
+                                                    <div>{{ message }}</div>
+                                                {% endfor %}
+                                            </div>
+                                        {% endif %}
                                         <div class="mb-3">
                                             <input class="form-control form-control-user" type="email" id="exampleInputEmail" aria-describedby="emailHelp" placeholder="Enter Email Address..." name="email" required>
                                         </div>
