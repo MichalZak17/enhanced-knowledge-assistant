@@ -5,6 +5,11 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.http import JsonResponse
 from users.models import CustomUser
+from django.contrib.auth.tokens import default_token_generator
+from django.core.mail import send_mail
+from django.template.loader import render_to_string
+from django.utils.http import urlsafe_base64_encode
+from django.utils.encoding import force_bytes
 
 def login_view(request):
     if request.user.is_authenticated:
@@ -63,3 +68,15 @@ def register_view(request):
         return JsonResponse({'success': True}, status=201)
 
     return render(request, 'register.html')
+
+def forgot_password_view(request):
+    if request.method == 'POST':
+        email = request.POST['email']
+        try:
+            user = CustomUser.objects.get(email=email)
+            # Here we would normally send an email, but for now, we just show a success message.
+            messages.success(request, 'A link to reset your password would be sent to your email.')
+        except CustomUser.DoesNotExist:
+            messages.error(request, 'No account found with that email address.')
+
+    return render(request, 'forgot_password.html')
